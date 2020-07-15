@@ -18,3 +18,6 @@ $(document).on("turbolinks:load", () => {
   $('[data-toggle="tooltip"]').tooltip()
   $('[data-toggle="popover"]').popover()
 })
+
+import 'stylesheets/application'
+window.toastr = require('toastr')

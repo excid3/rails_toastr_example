@@ -7,13 +7,13 @@ module ApplicationHelper
       notice: "alert-info"
     }.stringify_keys[flash_type.to_s] || flash_type.to_s
   end
-  
+
   def avatar_path(object, options = {})
     size = options[:size] || 180
     default_image = options[:default] || "mp"
     base_url =  "https://secure.gravatar.com/avatar"
     base_url_params = "?s=#{size}&d=#{default_image}"
-    
+
     if object.respond_to?(:avatar) && object.avatar.attached? && object.avatar.variable?
       object.avatar.variant(resize_to_fill: [size, size, { gravity: 'Center' }])
     elsif object.respond_to?(:email) && object.email
@@ -22,5 +22,21 @@ module ApplicationHelper
     else
       "#{base_url}/00000000000000000000000000000000#{base_url_params}"
     end
+  end
+
+  def toastr_flash
+    flash.each_with_object([]) do |(type, message), flash_messages|
+      type = 'success' if type == 'notice'
+      type = 'error' if type == 'alert'
+
+      text = <<~EOF
+      <script>
+        document.addEventListener("turbolinks:load", function() {
+          toastr.#{type}('#{message}', '', { closeButton: true, progressBar: true })
+        });
+      </script>
+      EOF
+      flash_messages << text.html_safe if message
+    end.join("\n").html_safe
   end
 end
